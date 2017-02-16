@@ -1,0 +1,16 @@
+.nested-list-item {
+  &--object {
+    display: inline-block;
+    border: 1px solid #000;
+    padding: 3px;
+  }
+  
+  &__pair {
+    display: flex;
+  }
+
+  &__pair-key {
+    flex: 1;
+    margin-right: 3px;
+  }
+}

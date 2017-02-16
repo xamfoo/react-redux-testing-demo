@@ -1,0 +1,10 @@
+.root {
+  .root-content {
+    display: flex;
+    padding: 5px;
+
+    > .list, > .nested-list {
+      flex: 1;
+    }
+  }
+}

@@ -2,17 +2,9 @@
  * This gulpfile will copy static libraries and a index.html file as well as
  * merge, babelify and uglify the rest of the javascript project.
  *
- * TODO:
- * - Separate media, libs and src with different watchers.
- * - Media and libs should only be copied to dist if they are different sizes.
- *
  * The expected project is to be laid out as such:
  *
  * ├─┬ src
- * │ ├─┬ libs
- * │ │ ├── tween.min.js
- * │ │ ├── pixi.min.js
- * │ │ └── jquery.min.js
  * │ ├─┬ media
  * │ │ ├── audofile1.wav
  * │ │ └── picture1.png
@@ -23,127 +15,203 @@
  * └── gulpfile.js
  */
 
-import watchify from 'watchify';
-import browserify from 'browserify';
-import gulp from 'gulp';
-import plumber from 'gulp-plumber';
-import uglify from 'gulp-uglify';
-import source from 'vinyl-source-stream';
-import buffer from 'vinyl-buffer';
-import gutil from 'gulp-util';
-import sourcemaps from 'gulp-sourcemaps';
 import babelify from 'babelify';
 import browserSync from 'browser-sync';
+import Browserify from 'browserify';
 import del from 'del';
+import envify from 'envify';
+import gulp from 'gulp';
+import concat from 'gulp-concat';
+import gulpEslint from 'gulp-eslint';
+import gulpSass from 'gulp-sass';
+import gulpPlumber from 'gulp-plumber';
+import gulpUtil from 'gulp-util';
+import path from 'path';
+import resolve from 'resolve';
+import runSequence from 'run-sequence';
+import source from 'vinyl-source-stream';
+import watchify from 'watchify';
 
-const customOpts = {
-  entries: ['./src/index.js'],
-  debug: true,
-  transform: [['babelify', { ignore: ["./src/libs/**"] }]],
-  ignore: ['./src/libs/**']
+const config = {
+  vendorPackages: [
+    'react',
+    'react-dom',
+    'react-redux',
+    'redux',
+    'underscore',
+  ]
 };
-const opts = Object.assign({}, watchify.args, customOpts);
-const b = watchify(browserify(opts));
-
-b.on('log', gutil.log);
 
 /**
  * This task removes all files inside the 'dist' directory.
  */
-gulp.task('clean', function()
-{
-    del.sync('./dist/**/*');
-});
-
-/**
- * This task will copy all files from libs into 'dist/libs'.
- * If you want to process them, just add your code to this task.
- */
-gulp.task('libs', ['clean'], function()
-{
-    return gulp.src(['./src/libs/**'])
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/libs'))
+gulp.task('clean', () => {
+  del.sync('./dist/**/*');
 });
 
 /**
  * This task will copy all files from media into 'dist/media'.
  * If you want to process them, just add your code to this task.
  */
-gulp.task('media', ['libs'], function()
-{
-    return gulp.src(['./src/media/**'])
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist/media'));
-});
+gulp.task('media', () =>
+  gulp.src(['./src/media/**'])
+    .pipe(gulpPlumber())
+    .pipe(gulp.dest('./dist/media'))
+);
+
+gulp.task('media:watch', ['media'], () => {
+  gulp.watch(['./src/media/**'], ['media']);
+})
 
 /**
  * This task will copy index.html into 'dist'.
  * If you want to process it, just add your code to this task.
  */
-gulp.task('index', ['media'], function()
-{
-    return gulp.src(['./src/index.html'])
-        .pipe(plumber())
-        .pipe(gulp.dest('./dist'));
-});
+gulp.task('index', () =>
+  gulp.src(['./src/index.html'])
+    .pipe(gulpPlumber())
+    .pipe(gulp.dest('./dist'))
+);
+
+gulp.task('index:watch', ['index'], () => {
+  gulp.watch(['./src/index.html'], ['index']);
+})
+
+gulp.task('sass', () => (
+  gulp.src('./src/**/*.scss')
+    .pipe(gulpPlumber())
+    .pipe(gulpSass({
+      includePaths: './node_modules/normalize.css'
+    })
+    .on('error', gulpSass.logError))
+    .pipe(concat('bundle.css'))
+    .pipe(gulp.dest('./dist'))
+));
+
+gulp.task('sass:watch', ['sass'], () => (
+  gulp.watch('./src/**/*.scss', ['sass'])
+));
+
+let hadLintError = false;
+
+const lintStream = (stream) => (
+  stream.pipe(gulpEslint())
+    .pipe(gulpEslint.format())
+    .pipe(gulpEslint.results((results) => {
+      if (results.errorCount > 0) {
+        hadLintError = true;
+      }
+    }))
+);
+
+gulp.task('lint', () =>
+  lintStream(
+    gulp.src([
+      './src/**/*.js',
+      './src/**/*.jsx',
+      '!./src/lib/testing/**/*.js',
+      '!./src/**/*.spec.js',
+    ]).pipe(gulpPlumber())
+  )
+);
 
 /**
  * This task will bundle all other js files and babelify them.
  * If you want to add other processing to the main js files, add your code here.
  */
-gulp.task('bundle', ['index'], function()
-{
-    return b.bundle()
-        .on('error', function(err)
-        {
-            console.log(err.message);
-            browserSync.notify(err.message, 3000);
-            this.emit('end');
-        })
-        .pipe(plumber())
-        .pipe(source('bundle.js'))
-        .pipe(buffer())
-        .pipe(uglify())
-        .pipe(sourcemaps.init({ loadMaps: true }))
-        .pipe(sourcemaps.write('./'))
-        .pipe(gulp.dest('./dist'));
-});
+const jsTask = ({ watch } = {}) => {
+  const bundle = (browserify) => (
+    browserify.bundle()
+      .pipe(gulpPlumber())
+      .on('error', function (err) {
+        gulpUtil.log(err.message);
+        browserSync.notify(err.message, 3000);
+        this.emit('end');
+      })
+      .pipe(source('bundle.js'))
+      .pipe(gulp.dest('./dist'))
+  );
 
-/**
- * This task starts watching the files inside 'src'. If a file is changed,
- * removed or added then it will run refresh task which will run the bundle task
- * and then refresh the page.
- *
- * For large projects, it may be beneficial to separate copying of libs and
- * media from bundling the source. This is especially true if you have large
- * amounts of media.
- */
-gulp.task('watch', ['bundle'], function()
-{
-    var watcher = gulp.watch('./src/**/*', ['refresh']);
-    watcher.on('change', function(event)
-    {
-        console.log('File ' + event.path + ' was ' + event.type + ', running tasks...');
+  const browserify = Browserify({
+    entries: ['./src/index.jsx'],
+    extensions: ['.js', '.jsx'],
+    debug: true,
+    cache: {}, // watchify required
+    packageCache: {}, // watchify required
+    plugin: watch ? [watchify] : [],
+    transform: [
+      ['babelify', { sourceMaps: true }],
+      'envify'
+    ],
+  })
+    .on('log', (msg) => {
+      gulpUtil.log('browserify:', msg);
+    })
+    .on('update', (files) => {
+      gulpUtil.log(
+        'watchify:',
+        'updating files',
+        files.map((file) => path.relative(__dirname, file))
+      );
+      lintStream(
+        gulp.src(files).pipe(gulpPlumber())
+      )
+        .pipe(gulpEslint.results((results) => {
+          if (hadLintError && !results.errorCount) {
+            runSequence('lint');
+            hadLintError = false;
+          }
+          bundle(browserify);
+        }));
     });
+
+  config.vendorPackages.forEach((id) => browserify.external(id));
+
+  return bundle(browserify);
+};
+
+gulp.task('js', jsTask);
+gulp.task('js:watch', () => jsTask({ watch: true }));
+
+gulp.task('vendor', () => {
+  const browserify = Browserify({
+    debug: true
+  });
+
+  config.vendorPackages.forEach((id) => {
+    browserify.require(resolve.sync(id), { expose: id });
+  });
+
+  return browserify.bundle()
+    .on('error', function (err) {
+      gulpUtil.log(err);
+      this.emit('end');
+    })
+    .pipe(source('vendor.js'))
+    .pipe(gulp.dest('./dist'));
 });
 
+gulp.task('watch', () => (
+  runSequence(
+    'clean',
+    'lint',
+    'vendor',
+    ['sass:watch', 'index:watch', 'media:watch', 'js:watch'],
+    'browser-sync',
+    'refresh',
+  )
+));
 
 /**
  * This task starts browserSync. Allowing refreshes to be called from the gulp
  * bundle task.
  */
-gulp.task('browser-sync', ['watch'], function()
-{
-    return browserSync({ server:  { baseDir: './dist' } });
-});
+gulp.task('browser-sync', () =>
+  browserSync({ server:  { baseDir: './dist' } })
+);
 
-/**
- * This is the default task which chains the rest.
- */
-gulp.task('default', ['browser-sync']);
+gulp.task('refresh', () =>
+  gulp.watch('./dist/**/*', browserSync.reload)
+);
 
-/**
- * Using a dependency ensures that the bundle task is finished before reloading.
- */
-gulp.task('refresh', ['bundle'], browserSync.reload);
+gulp.task('default', ['watch']);

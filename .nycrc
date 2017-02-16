@@ -1,0 +1,25 @@
+{
+  "include": [
+    "src/**/*.js",
+    "src/**/*.jsx"
+  ],
+  "exclude": [
+    "**/*.spec.js",
+    "coverage",
+    "dist",
+    "test",
+    "src/index.jsx"
+  ],
+  "extension": [".jsx"],
+  "reporter": [
+    "clover",
+    "lcov",
+    "text-summary"
+  ],
+  "require": [
+    "babel-register"
+  ],
+  "all": true,
+  "instrument": false,
+  "sourceMap": false
+}
