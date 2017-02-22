@@ -12,8 +12,6 @@
   ],
   "extension": [".jsx"],
   "reporter": [
-    "clover",
-    "lcov",
     "text-summary"
   ],
   "require": [

@@ -1,7 +1,5 @@
 {
   "dependencies": {
-    "ag-grid": "^8.0.1",
-    "ag-grid-react": "^8.0.0",
     "normalize.css": "^5.0.0",
     "react": "^15.4.2",
     "react-dom": "^15.4.2",
@@ -28,6 +26,7 @@
     "chai": "^3.5.0",
     "chai-enzyme": "^0.6.1",
     "cheerio": "^0.22.0",
+    "coveralls": "^2.11.16",
     "cross-env": "^3.1.4",
     "del": "^2.2.2",
     "envify": "^4.0.0",
@@ -47,6 +46,7 @@
     "gulp-sourcemaps": "^2.4.1",
     "gulp-uglify": "^2.0.1",
     "gulp-util": "^3.0.8",
+    "http-server": "^0.9.0",
     "istanbul": "^0.4.5",
     "jsdom": "^9.11.0",
     "jsdom-global": "^2.1.1",
@@ -56,15 +56,15 @@
     "reactify": "^1.1.1",
     "run-sequence": "^1.2.2",
     "sinon": "^1.17.7",
-    "vinyl-buffer": "^1.0.0",
     "vinyl-source-stream": "^1.1.0",
     "watchify": "^3.9.0"
   },
   "scripts": {
-    "coverage": "cross-env NODE_ENV=test nyc mocha",
-    "check-coverage": "nyc check-coverage --lines -5 --functions -5 --branches -5",
-    "test": "cross-env NODE_ENV=test mocha",
-    "test:watch": "cross-env NODE_ENV=test mocha --watch --reporter min",
-    "start": "cross-env NODE_ENV=development gulp"
+    "check-coverage": "nyc check-coverage --lines 90",
+    "coverage": "nyc report --reporter=html && http-server coverage",
+    "coveralls": "nyc report --reporter=text-lcov | coveralls",
+    "start": "cross-env NODE_ENV=development gulp",
+    "test": "cross-env NODE_ENV=test nyc mocha",
+    "test:watch": "cross-env NODE_ENV=test mocha --watch --reporter min"
   }
 }
