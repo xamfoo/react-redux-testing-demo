@@ -135,7 +135,7 @@ const jsTask = ({ watch } = {}) => {
   const browserify = Browserify({
     entries: ['./src/index.jsx'],
     extensions: ['.js', '.jsx'],
-    debug: true,
+    debug: process.env.NODE_ENV !== 'production',
     cache: {}, // watchify required
     packageCache: {}, // watchify required
     plugin: watch ? [watchify] : [],
@@ -175,7 +175,7 @@ gulp.task('js:watch', () => jsTask({ watch: true }));
 
 gulp.task('vendor', () => {
   const browserify = Browserify({
-    debug: true
+    debug: process.env.NODE_ENV !== 'production',
   });
 
   config.vendorPackages.forEach((id) => {
@@ -212,6 +212,15 @@ gulp.task('browser-sync', () =>
 
 gulp.task('refresh', () =>
   gulp.watch('./dist/**/*', browserSync.reload)
+);
+
+gulp.task('build', () =>
+  runSequence(
+    'clean',
+    'lint',
+    'vendor',
+    ['sass', 'index', 'media', 'js'],
+  )
 );
 
 gulp.task('default', ['watch']);
