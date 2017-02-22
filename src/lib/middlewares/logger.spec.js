@@ -1,20 +1,22 @@
-import logger from './logger';
+import logger, { __RewireAPI__ } from './logger';
 
 import { expect } from 'chai';
 import sinon from 'sinon';
-import { forEach } from 'underscore';
+import { forEach, noop } from 'underscore';
 import mockStore from '../testing/mock-store';
 import middlewares from '../middlewares';
 
 describe('logger middleware', () => {
-  let spies = {};
+  const spies = {
+    log: sinon.spy(),
+  };
 
   beforeEach(() => {
-    spies.log = sinon.stub(console, 'log');
+    __RewireAPI__.__Rewire__('log', spies.log);
   });
 
   afterEach(() => {
-    forEach(spies, spy => spy.restore());
+    __RewireAPI__.__ResetDependency__('log');
   });
 
   it('logs action and state', () => {
