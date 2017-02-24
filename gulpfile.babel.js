@@ -34,7 +34,6 @@ import watchify from 'watchify';
 
 const config = {
   vendorPackages: [
-    'node-polyglot',
     'react',
     'react-dom',
     'react-redux',

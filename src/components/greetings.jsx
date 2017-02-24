@@ -1,8 +1,7 @@
 import React, { PropTypes } from 'react';
-import { t } from '../lib/polyglot';
 
 const Greetings = ({ name }) => (
-  <div className="greetings">{ t('hello', { name }) }</div>
+  <div className="greetings">{ `Hello ${name}!` }</div>
 );
 
 Greetings.propTypes = {

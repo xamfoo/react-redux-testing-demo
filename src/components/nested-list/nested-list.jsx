@@ -1,6 +1,5 @@
 import React, { PropTypes } from 'react';
 import { connect } from 'react-redux';
-import { t } from '../../lib/polyglot';
 import { mapStateToProps, mapDispatchToProps } from './nested-list-connector';
 import NestedListInput from './nested-list-input';
 import NestedListItem from './nested-list-item';
@@ -38,7 +37,7 @@ class NestedList extends React.Component {
       <div className="nested-list">
         <h1>Nested List</h1>
         <NestedListInput value={inputValue} onChange={updateInputValue} />
-        <button onClick={clearData}>{ t('NestedList.clear') }</button>
+        <button onClick={clearData}>Clear List</button>
         <NestedListItem data={data} />
       </div>
     );
