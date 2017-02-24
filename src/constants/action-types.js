@@ -1,3 +1,2 @@
-/* eslint-disable import/prefer-default-export */
-
+export const CLEAR_NESTED_LIST = 'CLEAR_NESTED_LIST';
 export const UPDATE_NESTED_LIST = 'UPDATE_NESTED_LIST';

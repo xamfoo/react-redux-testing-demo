@@ -1,7 +1,11 @@
-/* eslint-disable import/prefer-default-export */
-import { UPDATE_NESTED_LIST } from '../constants/action-types';
+import {
+  CLEAR_NESTED_LIST,
+  UPDATE_NESTED_LIST,
+} from '../constants/action-types';
 
-// Simulate async action
+export const clearNestedListData = () => ({ type: CLEAR_NESTED_LIST });
+
+// Simulate async action with a Promise
 export const updateNestedListData = data => dispatch =>
   Promise.resolve().then(() => {
     dispatch({
