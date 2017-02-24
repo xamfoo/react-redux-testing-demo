@@ -8,9 +8,9 @@ This provides an example of test coverage for a project that is using React and 
 
 - ES6 code
 - Single React components
-- Single React components (Redux-connected)
-- Multiple React components as a group
-- Redux middleware
+- Multiple React components as a group (Redux-connected)
+- Redux sync and async actions
+- Redux reducer and middleware
 
 ## Usage
 
