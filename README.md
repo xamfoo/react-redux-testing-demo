@@ -16,7 +16,7 @@ This provides an example of test coverage for a project that is using React and 
 
 ### Online
 
-- [See the demo which is the testing target](https://github.com/xamfoo/react-redux-testing-demo)
+- [See the demo which is the testing target](https://xamfoo.github.io/react-redux-testing-demo/)
 - Browse `*.spec.js` files in this repository
 - [Browse the coverage provided by the tests](https://coveralls.io/github/xamfoo/react-redux-testing-demo?branch=master)
 
