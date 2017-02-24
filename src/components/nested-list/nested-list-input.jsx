@@ -32,7 +32,11 @@ class NestedListInput extends React.Component {
     return (
       <div className="nested-list-input">
         <div>Please enter valid JSON</div>
-        <textarea value={this.state.value} onChange={this.onChange} />
+        <textarea
+          className="nested-list-input__field"
+          value={this.state.value}
+          onChange={this.onChange}
+        />
       </div>
     );
   }
