@@ -3,13 +3,15 @@ import {
   UPDATE_NESTED_LIST,
 } from '../constants/action-types';
 
-export const clearNestedListData = () => ({ type: CLEAR_NESTED_LIST });
+export const clearData = () => ({ type: CLEAR_NESTED_LIST });
+
+export const updateData = data => ({
+  type: UPDATE_NESTED_LIST,
+  payload: data,
+});
 
 // Simulate async action with a Promise
-export const updateNestedListData = data => dispatch =>
+export const updateDataAsync = data => dispatch =>
   Promise.resolve().then(() => {
-    dispatch({
-      type: UPDATE_NESTED_LIST,
-      payload: data,
-    });
+    dispatch(updateData(data));
   });

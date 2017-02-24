@@ -1,6 +1,5 @@
-/* eslint-disable import/prefer-default-export */
-import { updateNestedListData } from '../../actions/nested-list';
+import { updateDataAsync } from '../../actions/nested-list';
 
-export const mapDispatchToProps = {
-  updateData: updateNestedListData,
-};
+/* eslint-disable import/prefer-default-export */
+
+export const mapDispatchToProps = { updateData: updateDataAsync };

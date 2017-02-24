@@ -7,8 +7,6 @@ class NestedListInput extends React.Component {
   constructor() {
     super();
 
-    this.state = { value: '' };
-
     this.onChange = this.onChange.bind(this);
     this.updateData = debounce(this.updateData.bind(this), 200);
   }
@@ -16,7 +14,7 @@ class NestedListInput extends React.Component {
   onChange(event) {
     const { value } = event.target;
 
-    this.setState({ value });
+    this.props.onChange(value);
     this.updateData(value);
   }
 
@@ -34,7 +32,7 @@ class NestedListInput extends React.Component {
         <div>Please enter valid JSON</div>
         <textarea
           className="nested-list-input__field"
-          value={this.state.value}
+          value={this.props.value}
           onChange={this.onChange}
         />
       </div>
@@ -43,7 +41,12 @@ class NestedListInput extends React.Component {
 }
 
 NestedListInput.propTypes = {
+  value: PropTypes.string.isRequired,
+  onChange: PropTypes.func.isRequired,
   updateData: PropTypes.func.isRequired,
 };
 
+// We introduce mapDispatchToProps here to create the scenario of nested
+// redux-connected components. We could also have passed the updateData action
+// from the parent.
 export default connect(null, mapDispatchToProps)(NestedListInput);
