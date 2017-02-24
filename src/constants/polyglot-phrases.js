@@ -1,5 +1,5 @@
 const polyglotPhrases = {
-  'hello': `Hello %{name}!`,
+  hello: 'Hello %{name}!',
 };
 
 export default polyglotPhrases;
