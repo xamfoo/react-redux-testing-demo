@@ -6,9 +6,9 @@ import React from 'react';
 
 describe('<Greetings />', () => {
   it('should greet with provided name', () => {
-    const name = 'a name';
+    const name = 'name';
     const wrapper = shallow(<Greetings name={ name } />);
 
-    expect(wrapper).to.have.text(`Greetings ${name}`);
+    expect(wrapper).to.have.text(`Hello ${name}!`);
   });
 });
