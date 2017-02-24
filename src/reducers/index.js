@@ -1,8 +1,3 @@
-import { combineReducers } from 'redux';
-import nestedList from './nested-list';
+import root from './root';
 
-const rootReducer = combineReducers({
-  nestedList,
-});
-
-export default rootReducer;
+export default root;
