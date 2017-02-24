@@ -7,7 +7,7 @@ import NestedList from './nested-list';
 
 const Root = () => (
   <div className="root">
-    <Greetings name="Sabre" />
+    <Greetings name="World" />
     <div className="root-content">
       <List />
       <NestedList />
