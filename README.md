@@ -78,4 +78,4 @@ Feel free to open issues for feedback and questions.
 
 ## License
 
-MIT License (Refer to LICENSE)
+MIT License (Refer to LICENSE.md)
