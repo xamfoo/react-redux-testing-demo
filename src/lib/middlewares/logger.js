@@ -8,7 +8,6 @@ const logger = store => next => (action) => {
   log('next state', store.getState());
 
   return result;
-  /* eslint-enable no-console */
 };
 
 export default logger;
